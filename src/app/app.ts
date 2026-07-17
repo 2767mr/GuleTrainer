@@ -26,6 +26,7 @@ export class App implements AfterViewInit, OnDestroy {
   private started = false;
   private startTime = 0;
   private inputs: ActualInput[] = [];
+  private readonly keysDown = new Set<string>();
 
   ngAfterViewInit() {
     const canvas = this.canvas()?.nativeElement;
@@ -67,11 +68,19 @@ export class App implements AfterViewInit, OnDestroy {
       return;
     }
 
+
     if (!this.started || time - this.startTime > this.fps * 75) {
       this.started = true;
       this.startTime = this.lastFrame;
       this.inputs = [];
+      this.keysDown.clear();
     }
+
+    if (this.keysDown.has(key)) {
+      return;
+    }
+
+    this.keysDown.add(key);
 
     this.inputs.push({
       key: key,
@@ -89,6 +98,11 @@ export class App implements AfterViewInit, OnDestroy {
     if (!key) {
       return;
     }
+
+    if (!this.keysDown.has(key)) {
+      return;
+    }
+    this.keysDown.delete(key);
 
     if (!this.started) {
       return;
